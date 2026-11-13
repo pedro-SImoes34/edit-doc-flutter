@@ -32,3 +32,10 @@ String? validarSenha(String? value) {
   }
   return null;
 }
+
+String? validarTitulo(String? value) {
+  if (value == null || value.trim().isEmpty) {
+    return 'Informe um título para o documento';
+  }
+  return null;
+}

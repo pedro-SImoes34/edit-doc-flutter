@@ -1,24 +1,49 @@
+import 'package:shared_preferences/shared_preferences.dart';
+
 class PreferencesService {
-  static final PreferencesService _instancia = PreferencesService._interno();
-  final Map<String, dynamic> _dados = {};
+  static const _chaveTema = 'tema';
+  static const _chaveNotificacoes = 'notificacoes';
+  static const _chaveSessaoNome = 'sessao_nome';
+  static const _chaveSessaoEmail = 'sessao_email';
 
-  PreferencesService._interno();
-
-  static Future<PreferencesService> getInstance() async {
-    await Future.delayed(const Duration(milliseconds: 50));
-    return _instancia;
+  Future<String> obterTema() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_chaveTema) ?? 'Claro';
   }
 
-  Future<bool> setString(String chave, String valor) async {
-    _dados[chave] = valor;
-    return true;
+  Future<void> salvarTema(String tema) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_chaveTema, tema);
   }
 
-  Future<bool> setBool(String chave, bool valor) async {
-    _dados[chave] = valor;
-    return true;
+  Future<bool> obterNotificacoes() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_chaveNotificacoes) ?? true;
   }
 
-  String? getString(String chave) => _dados[chave] as String?;
-  bool? getBool(String chave) => _dados[chave] as bool?;
+  Future<void> salvarNotificacoes(bool valor) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_chaveNotificacoes, valor);
+  }
+
+  Future<void> salvarSessao(String nome, String email) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_chaveSessaoNome, nome);
+    await prefs.setString(_chaveSessaoEmail, email);
+  }
+
+  /// Retorna null se não houver sessão salva.
+  Future<Map<String, String>?> obterSessao() async {
+    final prefs = await SharedPreferences.getInstance();
+    final nome = prefs.getString(_chaveSessaoNome);
+    final email = prefs.getString(_chaveSessaoEmail);
+    if (nome == null || email == null) return null;
+    return {'nome': nome, 'email': email};
+  }
+
+  Future<void> limparSessao() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_chaveSessaoNome);
+    await prefs.remove(_chaveSessaoEmail);
+  }
 }
